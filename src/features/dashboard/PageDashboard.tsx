@@ -1,66 +1,68 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
-import {
-  Alert,
-  AlertDescription,
-  AlertIcon,
-  AlertTitle,
-  Box,
-  Button,
-  Heading,
-  Text,
-  Wrap,
-} from '@chakra-ui/react';
-import { Trans, useTranslation } from 'react-i18next';
-import { LuAlertCircle, LuBookOpen, LuGithub } from 'react-icons/lu';
+import { Button, Card, Heading, Stack, Text } from '@chakra-ui/react';
+import { useTranslation } from 'react-i18next';
+import { SingleValue } from 'react-select';
 
-import { Icon } from '@/components/Icons';
 import { Page, PageContent } from '@/components/Page';
+import { Select } from '@/components/Select';
+import { useToastSuccess } from '@/components/Toast';
+import { useAccount } from '@/features/account/service';
+import { WebSocketContext } from '@/features/dashboard/WebSockerProvider';
+import { useUserList } from '@/features/users/service';
 
 export default function PageDashboard() {
   const { t } = useTranslation(['dashboard']);
+  const { messages, send } = useContext(WebSocketContext);
+  const toast = useToastSuccess();
+  const { data: user } = useAccount();
+
+  const username = user?.login ?? 'Unknown';
+  const [targetUsername, setTargetUsername] = useState(''); // The selected receiver's username
+
+  const { data: users } = useUserList();
+
+  useEffect(() => {
+    toast({
+      title: messages[messages.length - 1]?.username,
+      description: messages[messages.length - 1]?.message,
+    });
+  }, [messages]);
+
+  const handleChanged = (event: any) => {
+    setTargetUsername(event.value);
+  };
+
   return (
     <Page>
       <PageContent>
         <Heading size="md" mb="4">
           {t('dashboard:title')}
         </Heading>
-        <Alert status="success" colorScheme="brand" borderRadius="md">
-          <AlertIcon />
-          <Box flex="1">
-            <AlertTitle fontSize="lg">
-              {t('dashboard:welcome.title')}
-            </AlertTitle>
-            <AlertDescription display="block">
-              {t('dashboard:welcome.description')}
-              <br />
-              <Text as="a" href="https://www.bearstudio.fr">
-                <Trans t={t} i18nKey="dashboard:welcome.author" />
-              </Text>
-            </AlertDescription>
-          </Box>
-        </Alert>
-        <Wrap mt="4" spacing="4">
-          <Button
-            variant="link"
-            as="a"
-            href="https://github.com/BearStudio/start-ui-web"
-          >
-            <Icon icon={LuGithub} me="1" /> {t('dashboard:links.github')}
-          </Button>
-          <Button variant="link" as="a" href="https://docs.web.start-ui.com">
-            <Icon icon={LuBookOpen} me="1" />{' '}
-            {t('dashboard:links.documentation')}
-          </Button>
-          <Button
-            variant="link"
-            as="a"
-            href="https://github.com/BearStudio/start-ui/issues/new"
-          >
-            <Icon icon={LuAlertCircle} me="1" />{' '}
-            {t('dashboard:links.openIssue')}
-          </Button>
-        </Wrap>
+        <Stack mb={6} spacing={4}>
+          {messages.map((message, index) => (
+            <Card key={index} p={4}>
+              <Text fontWeight="bold">{message.username}</Text>
+              <Text>{message.message}</Text>
+            </Card>
+          ))}
+        </Stack>
+        <Select
+          options={users?.users.map((user) => {
+            return {
+              label: user.login,
+              value: user.login,
+            };
+          })}
+          onChange={handleChanged}
+        />
+        <Button
+          onClick={() =>
+            send({ type: 'message', username, targetUsername, message: 'Test' })
+          }
+        >
+          Send message
+        </Button>
       </PageContent>
     </Page>
   );

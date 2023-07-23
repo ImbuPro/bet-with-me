@@ -13,23 +13,13 @@ import {
 } from '@/app/api/jhipster-mocks/_helpers/user';
 
 export const GET = apiMethod({
-  admin: true,
-  handler: async ({ searchParams }) => {
-    const options = z
-      .object({
-        page: z.string().optional().default('0').transform(Number),
-        size: z.string().optional().default('10').transform(Number),
-      })
-      .default({ page: '0', size: '10' })
-      .parse({
-        page: searchParams.get('page'),
-        size: searchParams.get('size'),
-      });
-
+  // admin: true,
+  handler: async () => {
     const [users, total] = await Promise.all([
       db.user.findMany({
-        skip: options.page * options.size,
-        take: options.size,
+        where: {
+          activated: true,
+        },
       }),
       db.user.count(),
     ]);
