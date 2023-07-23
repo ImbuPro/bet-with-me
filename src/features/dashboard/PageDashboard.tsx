@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 
 import { Button, Card, Heading, Stack, Text } from '@chakra-ui/react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { SingleValue } from 'react-select';
 
 import { Page, PageContent } from '@/components/Page';
 import { Select } from '@/components/Select';
@@ -25,7 +25,7 @@ export default function PageDashboard() {
   useEffect(() => {
     toast({
       title: messages[messages.length - 1]?.username,
-      description: messages[messages.length - 1]?.message,
+      description: messages[messages.length - 1]?.details?.description,
     });
   }, [messages]);
 
@@ -42,8 +42,38 @@ export default function PageDashboard() {
         <Stack mb={6} spacing={4}>
           {messages.map((message, index) => (
             <Card key={index} p={4}>
-              <Text fontWeight="bold">{message.username}</Text>
-              <Text>{message.message}</Text>
+              <Stack>
+                <Stack direction="row">
+                  <Text fontWeight="bold">From :</Text>
+                  <Text>{message.username}</Text>
+                </Stack>
+                <Stack direction="row">
+                  <Text fontWeight="bold">Message :</Text>
+                  <Text>{message.details?.description}</Text>
+                </Stack>
+                <Stack direction="row">
+                  <Text fontWeight="bold">Amount :</Text>
+                  <Text>
+                    {message.details?.amount} {message.details?.currency}
+                  </Text>
+                </Stack>
+                <Stack direction="row">
+                  <Text fontWeight="bold">Deadline :</Text>
+                  <Text>
+                    {dayjs(message.details?.deadline).format(
+                      'DD/MM/YYYY HH:mm'
+                    )}
+                  </Text>
+                </Stack>
+                <Stack flex={1} direction="row">
+                  <Button flex={1} colorScheme="success">
+                    Accept
+                  </Button>
+                  <Button flex={1} colorScheme="error">
+                    Decline
+                  </Button>
+                </Stack>
+              </Stack>
             </Card>
           ))}
         </Stack>
@@ -58,7 +88,17 @@ export default function PageDashboard() {
         />
         <Button
           onClick={() =>
-            send({ type: 'message', username, targetUsername, message: 'Test' })
+            send({
+              type: 'message',
+              username,
+              targetUsername,
+              details: {
+                amount: 1,
+                currency: 'USD',
+                description: 'test',
+                deadline: dayjs().toDate(),
+              },
+            })
           }
         >
           Send message

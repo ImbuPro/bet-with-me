@@ -6,7 +6,12 @@ export type WebSocketMessage = {
   type: 'connect' | 'message';
   username: string;
   targetUsername?: string;
-  message?: string;
+  details?: {
+    amount: number;
+    currency: string;
+    description: string;
+    deadline: Date;
+  };
 };
 
 const WebSocketContext = createContext<{
