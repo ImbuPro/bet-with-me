@@ -18,6 +18,7 @@ import PageLogin from '@/features/auth/PageLogin';
 import PageLogout from '@/features/auth/PageLogout';
 import PageDashboard from '@/features/dashboard/PageDashboard';
 import { WebSocketProvider } from '@/features/dashboard/WebSockerProvider';
+import PageSent from '@/features/sent/PageSent';
 import { Layout } from '@/layout/Layout';
 import { Loader } from '@/layout/Loader';
 
@@ -121,6 +122,10 @@ export const routes = [
                 <PageDashboard />,
               </WebSocketProvider>
             ),
+          },
+          {
+            path: 'sent',
+            element: <PageSent />,
           },
           {
             path: 'account',

@@ -1,22 +1,24 @@
 import { ReactNode, createContext, useEffect, useRef, useState } from 'react';
 
 import { useAccount } from '@/features/account/service';
+import { Bet } from '@/features/dashboard/service';
 
 export type WebSocketMessage = {
   type: 'connect' | 'message';
   username: string;
   targetUsername?: string;
   details?: {
-    amount: number;
-    currency: string;
     description: string;
-    deadline: Date;
   };
 };
 
 const WebSocketContext = createContext<{
   messages: WebSocketMessage[];
-  send: (message: WebSocketMessage) => void;
+  send: (
+    message:
+      | WebSocketMessage
+      | Omit<Bet, 'sender' | 'betStatus' | 'createdByUserId' | 'id'>
+  ) => void;
 }>({
   messages: [],
   send: () => {
@@ -30,7 +32,11 @@ const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
   const ws = useRef<WebSocket | null>(null);
 
-  const sendFunction = (message: WebSocketMessage) => {
+  const sendFunction = (
+    message:
+      | WebSocketMessage
+      | Omit<Bet, 'sender' | 'betStatus' | 'createdByUserId' | 'id'>
+  ) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(message));
     } else {

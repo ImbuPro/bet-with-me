@@ -31,6 +31,7 @@ model User {
   updatedByUserId Int?
   updatedBy       User?    @relation("UpdatedByUser", fields: [updatedByUserId], references: [id])
   updatedUsers    User[]   @relation("UpdatedByUser")
+  Bets            Bets[]
 }
 
 model VerificationToken {
@@ -39,4 +40,17 @@ model VerificationToken {
   expires DateTime
 
   @@unique([token, userId])
+}
+
+model Bets {
+  id              Int      @id @default(autoincrement())
+  sender         String
+  receiver       String
+  description     String
+  betDeadline     DateTime @default(now())
+  betAmount       Int
+  betStatus       String   @default("PENDING")
+  createdAt       DateTime @default(now())
+  createdByUserId Int?
+  createdBy       User?    @relation(fields: [createdByUserId], references: [id])
 }
