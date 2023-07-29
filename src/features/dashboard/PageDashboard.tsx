@@ -65,14 +65,16 @@ export default function PageDashboard() {
                     )}
                   </Text>
                 </Stack>
-                <Stack flex={1} direction="row">
-                  <Button flex={1} colorScheme="success">
-                    Accept
-                  </Button>
-                  <Button flex={1} colorScheme="error">
-                    Decline
-                  </Button>
-                </Stack>
+                {message.username !== 'Server' && (
+                  <Stack flex={1} direction="row" mt={4}>
+                    <Button flex={1} colorScheme="success">
+                      Accept
+                    </Button>
+                    <Button flex={1} colorScheme="error">
+                      Decline
+                    </Button>
+                  </Stack>
+                )}
               </Stack>
             </Card>
           ))}
